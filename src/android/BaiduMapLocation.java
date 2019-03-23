@@ -10,6 +10,7 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.LocationClientOption.LocationMode;
+import com.baidu.location.Poi;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -74,7 +75,14 @@ public class BaiduMapLocation extends CordovaPlugin {
                 json.put("userIndoorState", location.getUserIndoorState());
                 json.put("direction", location.getDirection());
                 json.put("locationDescribe", location.getLocationDescribe());
-
+                List<Poi> pois=location.getPoiList();
+                for (Poi poi : pois) {
+                  JSONObject temp=new JSONObject();
+                  temp.put("id", poi.getId());
+                  temp.put("name", poi.getName());//一般是建筑名称
+                  temp.put("rank", poi.getRank());//
+                  json.accumulate("pois", temp);
+                }
                 PluginResult pluginResult;
                 if (location.getLocType() == BDLocation.TypeServerError
                         || location.getLocType() == BDLocation.TypeNetWorkException
@@ -191,10 +199,10 @@ public class BaiduMapLocation extends CordovaPlugin {
             mOption.setLocationNotify(false);//可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
             mOption.setIgnoreKillProcess(true);//可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
             mOption.setIsNeedLocationDescribe(true);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
-            mOption.setIsNeedLocationPoiList(false);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
+            mOption.setIsNeedLocationPoiList(true);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
             mOption.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
 
-            mOption.setIsNeedAltitude(false);//可选，默认false，设置定位时是否需要海拔信息，默认不需要，除基础定位版本都可用
+            mOption.setIsNeedAltitude(true);//可选，默认false，设置定位时是否需要海拔信息，默认不需要，除基础定位版本都可用
 
         }
         return mOption;
